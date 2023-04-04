@@ -37,7 +37,15 @@ public class CollisionAvoidance : MonoBehaviour
         InvokeRepeating("SpeedLimitUpdate", 1.0f, 1f / updateRate);
     }
 
+    // Start of Amrit code
+    public bool DetectObstacle()
+    {
+        // Returns True if robot in front of obstacle
+        float minDistance = GetMinDistanceToObstacle();
+        return minDistance < stopDistance;
+    }
 
+    // End of Amrit code
     private void SpeedLimitUpdate()
     {
         float minDistance = GetMinDistanceToObstacle();
@@ -64,4 +72,6 @@ public class CollisionAvoidance : MonoBehaviour
         }
         return minDistance;
     }
+
+
 }

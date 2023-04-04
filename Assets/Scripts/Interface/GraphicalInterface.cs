@@ -72,6 +72,9 @@ public class GraphicalInterface : MonoBehaviour
     public GameObject leftCameraViewingDisplay;
     public GameObject rightCameraViewingDisplay;
     public GameObject backCameraViewingDisplay;
+    //public GameObject base0ViewingDisplay;
+    //public GameObject base90ViewingDisplay;
+    //public GameObject base270ViewingDisplay;
     // ik
     private GameObject leftEndEffectorRef; 
     private GameObject rightEndEffectorRef;
@@ -381,6 +384,9 @@ public class GraphicalInterface : MonoBehaviour
         leftCameraViewingDisplay.SetActive(false);
         rightCameraViewingDisplay.SetActive(false);
         backCameraViewingDisplay.SetActive(false);
+        //base0ViewingDisplay.SetActive(false);
+        //base90ViewingDisplay.SetActive(false);
+        //base270ViewingDisplay.SetActive(false);
 
         string secondaryCameraName = cameraSystem.GetName(secondaryCameraIndex).ToUpper();
         switch (secondaryCameraName)
@@ -405,6 +411,22 @@ public class GraphicalInterface : MonoBehaviour
                 backCameraViewingDisplay.GetComponent<RectTransform>().localScale = 
                     new Vector3(0.6f, 0.6f, 0f);
                 break;
+            /*case "BASE0":
+                base0ViewingDisplay.SetActive(true);
+                base0ViewingDisplay.GetComponent<RectTransform>().localScale =
+                    new Vector3(0.6f, 0.6f, 0f);
+                break;
+            case "BASE90":
+                base90ViewingDisplay.SetActive(true);
+                base90ViewingDisplay.GetComponent<RectTransform>().localScale =
+                    new Vector3(0.6f, 0.6f, 0f);
+                break;
+            case "BASE270":
+                base270ViewingDisplay.SetActive(true);
+                base270ViewingDisplay.GetComponent<RectTransform>().localScale =
+                    new Vector3(0.6f, 0.6f, 0f);
+                break;
+            */
             default:
                 break;
         }
@@ -428,6 +450,22 @@ public class GraphicalInterface : MonoBehaviour
                 backCameraViewingDisplay.SetActive(true);
                 backCameraViewingDisplay.GetComponent<RectTransform>().localScale = Vector3.one;
                 break;
+            /*case "BASE0":
+                base0ViewingDisplay.SetActive(true);
+                base0ViewingDisplay.GetComponent<RectTransform>().localScale =
+                    new Vector3(0.6f, 0.6f, 0f);
+                break;
+            case "BASE90":
+                base90ViewingDisplay.SetActive(true);
+                base90ViewingDisplay.GetComponent<RectTransform>().localScale =
+                    new Vector3(0.6f, 0.6f, 0f);
+                break;
+            case "BASE270":
+                base270ViewingDisplay.SetActive(true);
+                base270ViewingDisplay.GetComponent<RectTransform>().localScale =
+                    new Vector3(0.6f, 0.6f, 0f);
+                break;
+            */
             default:
                 break;
         }

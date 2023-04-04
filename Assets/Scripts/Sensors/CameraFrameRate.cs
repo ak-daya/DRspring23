@@ -37,6 +37,9 @@ public class CameraFrameRate : MonoBehaviour
             // this will cause problems for rendering dynamic objects
             // cam.Render();
             cam.enabled = true;
+            cam.ResetProjectionMatrix();
+            cam.orthographic = false;
+            cam.fieldOfView = 75.0f;
         }
         else
         {
