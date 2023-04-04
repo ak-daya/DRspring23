@@ -40,6 +40,7 @@ public class StateReader : MonoBehaviour
     public GameObject[] extraObjects;
     public Vector3[] objectPositions;
     public Vector3[] objectRotations;
+    public bool isStuck;
 
     void Start()
     {
@@ -67,6 +68,9 @@ public class StateReader : MonoBehaviour
             extraObjects = new GameObject[0];
         objectPositions = new Vector3[extraObjects.Length];
         objectRotations = new Vector3[extraObjects.Length];
+
+        // Set robot state as not stuck
+        isStuck = false;
 
         // Update
         deltaTime = 1f / updateRate;

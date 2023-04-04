@@ -48,6 +48,9 @@ public class AutoNavigation : MonoBehaviour
     public LineRenderer lineRenderer;
     public bool drawPathEnabled = true;
 
+    // Debug
+    private int i = 0;
+
 
     void Start()
     {
@@ -100,8 +103,7 @@ public class AutoNavigation : MonoBehaviour
         if (elapsed > replanTime)
         {
             // replan
-            elapsed = 0f;
-            SetGoal(this.goal);
+            Replan();
         }
 
         // Autonomy disabled
@@ -115,7 +117,7 @@ public class AutoNavigation : MonoBehaviour
             tolerance = agent.stoppingDistance;
         // move to current waypoint
         float currentDis = (transform.position - waypoints[waypointIndex]).magnitude;
-        
+
         /*
         // temp - Check if the robot is approaching the waypoint
         if (prevDis == 0)
@@ -153,8 +155,7 @@ public class AutoNavigation : MonoBehaviour
         }
     }
 
-
-    private void NavigateToWaypoint(Vector3 waypoint)
+private void NavigateToWaypoint(Vector3 waypoint)
     {
         // P controller, Kp = 2
         float Kp = 2;
@@ -183,6 +184,12 @@ public class AutoNavigation : MonoBehaviour
         }
     }
     
+    public void Replan()
+    {
+        // replan
+        elapsed = 0f;
+        SetGoal(this.goal);
+    }
 
     public void EnableAutonomy(bool changeArmPose = true)
     {
