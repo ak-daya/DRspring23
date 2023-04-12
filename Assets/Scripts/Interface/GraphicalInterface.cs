@@ -18,11 +18,19 @@ public class GraphicalInterface : MonoBehaviour
     public GameObject locationInfo;
     public GameObject recordIcon;
     public GameObject helpDisplay;
-    
+
+    // OBH
+    private Vector3 prevPos;
+    private float currentPos;
+    private float dPos = 1;
+    private float elapsedTime;
+    private float nextActionTime;
+
     // Robot
     private GameObject robot;
     private Localization localization;
     private StateReader stateReader;
+    private CollisionReader collisionReader;
     private AutoNavigation autoNavigation;
     // main camera
     public GameObject cameraDisplay;
@@ -107,7 +115,7 @@ public class GraphicalInterface : MonoBehaviour
     // Timer
     public GameObject timerPanel;
     private TextMeshProUGUI timerPanelText;
-    private float stuckTimeElapsed = 0f;
+    private float stuckTimeElapsed;
     private float stuckTime = 10f;
     private bool isStuck = false;
 
@@ -229,26 +237,38 @@ public class GraphicalInterface : MonoBehaviour
                 SetNavigationGoal(hit.point);
         }
 
-        // check if robot stuck
+
+        //Debug.Log("Time : " + stuckTimeElapsed + "vel " + stateReader.linearVelocity.magnitude);
         if (autoNavigation.active)
         {
-            // When robot rotates, there's still linear velocity. Maybe use delta of transform.position
-            if (stateReader.linearVelocity[2] < 0.01f)
+
+            if (stateReader.linearVelocity.magnitude <= 0.5f)
             {
                 stuckTimeElapsed += Time.deltaTime;
+
                 if (stuckTimeElapsed > stuckTime)
                 {
                     // Stuck
+                    //Debug.Log("I'm stuck");
                     isStuck = true;
+                    autoNavigation.DisableAutonomy();
                     stuckTimeElapsed = 0f;
                 }
+                // Call collisionReader.IsColliding() to stop robot when colliding
+                //  Debug.Log("Collision: " + collisionReader.IsColliding());
+                //else if (collisionReader != null) { }
+                //Debug.Log("collision here: " + collisionReader.IsColliding());
             }
             else
+            {
                 isStuck = false;
                 stuckTimeElapsed = 0f;
+            }
         }
-        
-            
+        else
+        {
+            stuckTimeElapsed = 0f;
+        }
 
         // barcode
         if (Input.GetKeyDown(KeyCode.B))
@@ -269,6 +289,7 @@ public class GraphicalInterface : MonoBehaviour
     // Record key pressed during the use of interface
     // TODO though it works, 1) may not be the best script to put this code, and
     // 2) may not be the most reasonable to put all key pressed under task string record
+    
     private void MonitorKeyPressed()
     {
         if (currentTask == null || robot == null)
@@ -510,6 +531,9 @@ public class GraphicalInterface : MonoBehaviour
         laser = robot.GetComponentInChildren<Laser>();
         localization = robot.GetComponentInChildren<Localization>();
         stateReader = robot.GetComponentInChildren<StateReader>();
+        // Collision Reader resets to null
+        //collisionReader = robot.GetComponentInChildren<CollisionReader>();
+        //Debug.Log("exists? " + collisionReader != null);
         gopherControl = robot.GetComponentInChildren<GopherControl>();
         autoNavigation = robot.GetComponentInChildren<AutoNavigation>();
         // Get IK and End effector reference transform for

@@ -35,6 +35,7 @@ public class AutoNavigation : MonoBehaviour
     private Vector3[] waypoints = new Vector3[0];
     private int waypointIndex = 0;
     private bool rotationNeeded = true;
+    public float currentDis;
     /*
     // temp - could be removed after controller is implemented
     private float prevDis = 0f;
@@ -116,7 +117,7 @@ public class AutoNavigation : MonoBehaviour
         if (waypointIndex == waypoints.Length - 1)
             tolerance = agent.stoppingDistance;
         // move to current waypoint
-        float currentDis = (transform.position - waypoints[waypointIndex]).magnitude;
+        currentDis = (transform.position - waypoints[waypointIndex]).magnitude;
 
         /*
         // temp - Check if the robot is approaching the waypoint
