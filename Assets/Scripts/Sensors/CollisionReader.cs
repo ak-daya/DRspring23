@@ -24,8 +24,6 @@ public class CollisionReader : MonoBehaviour
     public string[] collisionOtherNames;
     public float[] collisionRelativeSpeed;
 
-    private bool isColliding;
-
     void Awake()
     {
         // Audio effect
@@ -65,7 +63,6 @@ public class CollisionReader : MonoBehaviour
         // Prevent too frequent collision detection
         if (!collisionAudio.isPlaying)
         {
-            isColliding = true;
             collisionAudio.volume = relativeSpeed*0.3f;
             collisionAudio.Play();
 
@@ -75,15 +72,5 @@ public class CollisionReader : MonoBehaviour
             collisionOtherNames[storageIndex] = other;
             collisionRelativeSpeed[storageIndex] = relativeSpeed;
         }
-    }
-
-    public void NoCollision()
-    {
-        isColliding = false;
-    }
-
-    public bool IsColliding()
-    {
-        return isColliding;
     }
 }

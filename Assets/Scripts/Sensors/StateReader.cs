@@ -41,7 +41,6 @@ public class StateReader : MonoBehaviour
     public Vector3[] objectPositions;
     public Vector3[] objectRotations;
     public bool isStuck;
-
     void Start()
     {
         startTime = Time.time;
@@ -69,9 +68,8 @@ public class StateReader : MonoBehaviour
         objectPositions = new Vector3[extraObjects.Length];
         objectRotations = new Vector3[extraObjects.Length];
 
-        // Set robot state as not stuck
         isStuck = false;
-
+        
         // Update
         deltaTime = 1f / updateRate;
         InvokeRepeating("ReadState", 1f, deltaTime);

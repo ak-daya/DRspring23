@@ -486,7 +486,7 @@ public class ComprehensiveExperiment : Experiment
         string[] stepRoomNames = new string[0];
         string[] taskRoomNames = new string[0];
 
-        // Avaliable rooms based on current step
+        // Available rooms based on current step
         if (stepIndex == 0) 
             stepRoomNames = new string[] {"Room P103", "Room P104", "Room S102"};
         else if (stepIndex == 1)
@@ -496,7 +496,7 @@ public class ComprehensiveExperiment : Experiment
         else if (stepIndex == 3)
             stepRoomNames = new string[] {"Room P101", "Room P102", "Room S101"};
         
-        // Avaliable rooms based on current task and difficulty
+        // Available rooms based on current task and difficulty
         // Room L101 only for 2.1-2 and 2.4-3
         // Pharmacy only for 2.2-3 and 2.3-3
         if (type2TaskIndex == 0) 
