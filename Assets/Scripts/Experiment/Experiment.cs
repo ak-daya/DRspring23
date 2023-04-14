@@ -62,7 +62,7 @@ public abstract class Experiment : MonoBehaviour
     }
 
 
-    // Get the total numbe of tasks in this experiment
+    // Get the total number of tasks in this experiment
     public int GetNumTasks()
     {
         return tasks.Length;
