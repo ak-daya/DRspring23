@@ -18,6 +18,10 @@ public class GraphicalInterface : MonoBehaviour
     public GameObject locationInfo;
     public GameObject recordIcon;
     public GameObject helpDisplay;
+    public GameObject helpDisplay2;
+    public GameObject infoObstacle1;
+    public GameObject infoObstacle2;
+    public GameObject infoObstacle3;
 
     // OBH
     private Vector3 prevPos;
@@ -64,6 +68,7 @@ public class GraphicalInterface : MonoBehaviour
     private GameObject mapCameraObject;
     private Camera mapCamera;
     private Vector3 prevClickPoint = Vector3.zero;
+    public Vector3 punto = Vector3.zero;
     
     // battery
     private float robotSpawnedTime;
@@ -109,8 +114,22 @@ public class GraphicalInterface : MonoBehaviour
     public GameObject messagePanel;
     private TextMeshProUGUI messagePanelText;
 
+    // Location information
+    public GameObject message2Panel;
+    private TextMeshProUGUI message2PanelText;
+    
+    // Timing messages
+    //private GameObject tmrMessage;
+    //private TextMeshProUGUI tmrMessageText;
     // Help
     private TextMeshProUGUI helpDisplayText;
+    private TextMeshProUGUI helpDisplay2Text;
+    // obstacle
+    private TextMeshProUGUI infoObstacleText;
+    //future trajectory 
+    private LineRenderer lineRenderer;
+
+    public TextMeshProUGUI RobotText;
     
     // Timer
     public GameObject timerPanel;
@@ -123,6 +142,8 @@ public class GraphicalInterface : MonoBehaviour
     private int FPS;
     private float FPSSum;
     private int FPSCount;
+    private bool remember;
+    private bool flag=false;
 
     void Start() 
     {
@@ -174,9 +195,14 @@ public class GraphicalInterface : MonoBehaviour
 
         // Pop up message
         messagePanelText = messagePanel.GetComponentInChildren<TextMeshProUGUI>();
+        // Location in real-time
+        //message2PanelText = message2Panel.GetComponentInChildren<TextMeshProUGUI>();
 
         // Help display
         helpDisplayText = helpDisplay.GetComponentInChildren<TextMeshProUGUI>();
+        helpDisplay2Text = helpDisplay2.GetComponentInChildren<TextMeshProUGUI>();
+        //Obstacle
+        infoObstacleText = infoObstacle1.GetComponentInChildren<TextMeshProUGUI>();
 
         // Timer
         timerPanelText = timerPanel.GetComponentInChildren<TextMeshProUGUI>();
@@ -219,22 +245,37 @@ public class GraphicalInterface : MonoBehaviour
         if (input.isFocused)
             return;
         // help panel
-        if (Input.GetKeyDown(KeyCode.H)) 
-            ChangeHelpDisplay();
+        if (Input.GetKeyDown(KeyCode.H))
+        { 
+            ChangeHelpDisplay2();
+            //ChangeInfoObstacle();
+        }
         // minimap
         if(Input.GetKeyDown(KeyCode.M))
+        {
             if (Input.GetKey(KeyCode.LeftShift))
                 ChangeMinimapView();
             else
-                ZoomMap();
+                {
+                    ZoomMap();
+                    ChangeHelpDisplay2();
+                    //ChangeInfoObstacle();
+                }
+        }
+
         // map navigation
         if (displayMapInMain && autoNavigation != null &&
             Input.GetMouseButtonDown(0))
         {
             RaycastHit hit;
             Ray ray = mapCamera.ScreenPointToRay(Input.mousePosition);
+            // Debug.Log("Mouse clic" + Input.mousePosition);
             if (Physics.Raycast(ray, out hit))
+            {
                 SetNavigationGoal(hit.point);
+                punto=hit.point;
+                // Debug.Log("Setting goal" + hit.point);
+            }
         }
 
 
@@ -251,7 +292,7 @@ public class GraphicalInterface : MonoBehaviour
                     // Stuck
                     //Debug.Log("I'm stuck");
                     isStuck = true;
-                    autoNavigation.DisableAutonomy();
+                    // autoNavigation.DisableAutonomy();
                     stuckTimeElapsed = 0f;
                 }
                 // Call collisionReader.IsColliding() to stop robot when colliding
@@ -420,6 +461,8 @@ public class GraphicalInterface : MonoBehaviour
 
         // Help display
         UpdateHelpDisplay(controlMode);
+        UpdateHelpDisplay2(controlMode, localization.position);
+        UpdateObstacle(isStuck);
     }
 
     private void UpdateCameraViewing(int cameraIndex)
@@ -482,6 +525,7 @@ public class GraphicalInterface : MonoBehaviour
 
     private void UpdateHelpDisplay(GopherControl.ControlMode controlMode)
     {
+        //string location = HospitalMapUtil.GetLocationName(localization.position);
         helpDisplayText.text = "Switch Control\n" + "  Key ← ↓ →\n"
                              + "Switch Camera\n" + "  Num (0+) 8 4 5 6\n"
                              + "Camera Control\n" + "  Enabling: ↑, Mouse\n"
@@ -503,11 +547,54 @@ public class GraphicalInterface : MonoBehaviour
         }
     }
 
+    private void UpdateHelpDisplay2(GopherControl.ControlMode controlMode, Vector3 position)
+    {
+        string location = HospitalMapUtil.GetLocationName(localization.position);
+        helpDisplay2Text.text = location.ToUpper();
+        //NextGoal.ToUpper()=location.ToUpper();
+        if (punto!=Vector3.zero)
+        {
+            string NextGoal = HospitalMapUtil.GetLocationName(punto);
+            helpDisplay2Text.text = location.ToUpper()+" → " + NextGoal.ToUpper();
+            if (autoNavigation.active==false)
+                {
+                helpDisplay2Text.text = location.ToUpper();
+                //punto=Vector3.zero;
+                }    
+        }
+        //lineRenderer.startWidth = 0.5f;
+        //lineRenderer.endWidth = 0.5f;
+        //Color c1 = Color.blue;
+        //Color c2 = new Color(241, 90, 34, 0);
+        //lineRenderer.SetColors(c1, c2);
+    }
+    
+    private void UpdateObstacle(bool isStuck)
+    {
+        if (isStuck==true)
+            {
+                infoObstacle1.SetActive(true);
+                //flag=true;
+                //infoObstacle2.SetActive(false);
+                //infoObstacle3.SetActive(false);
+                //infoObstacleText.text = "STUCK: " + isStuck;
+            }
+        //else
+        //    {
+        //        infoObstacle1.SetActive(false);
+                //infoObstacleText.text = "";
+        //    }
+        //if (isStuck==false && autoNavigation.active==true)
+        //{
+        //        infoObstacle2.SetActive(true);
+                //infoObstacleText.text = "STUCK: " + isStuck;
+        //}
+    }
     private void UpdateLocalization(Vector3 position, Vector3 rotation)
     {
         // location name
         string location = HospitalMapUtil.GetLocationName(position);
-        locationText.text = "Current - " + location;
+        locationText.text = "CURRENT - " + location.ToUpper();
         // update map in minimap display
         map.transform.position = position - robot.transform.position + new Vector3(0f, -3f, 0f);
         map.transform.rotation = Quaternion.Euler(rotation - robot.transform.rotation.eulerAngles); 
@@ -625,6 +712,15 @@ public class GraphicalInterface : MonoBehaviour
     public void ChangeHelpDisplay()
     {
         helpDisplay.SetActive(!helpDisplay.activeSelf);
+    }
+    public void ChangeHelpDisplay2()
+    {
+        helpDisplay2.SetActive(!helpDisplay2.activeSelf);
+    }
+    public void ChangeInfoObstacle1()
+    {
+        //Debug.Log("cambiando");
+        infoObstacle1.SetActive(!infoObstacle1.activeSelf);
     }
 
     public void ChangeBarCodeScanDisplay()
@@ -749,7 +845,7 @@ public class GraphicalInterface : MonoBehaviour
         }
     }
 
-    public void ShowPopUpMessage(string message, float duration=1.5f)
+    public void ShowPopUpMessage(string message, float duration=3f)
     {
         messagePanelText.text = message;
         StartCoroutine(PopUpMessageCoroutine(duration));
@@ -761,6 +857,18 @@ public class GraphicalInterface : MonoBehaviour
         messagePanel.SetActive(false);
     }
 
+    public void ShowLocation(string message, float duration=10f)
+    {
+        message2PanelText.text = message;
+        StartCoroutine(ShowLocationCoroutine(duration));
+    }
+    private IEnumerator ShowLocationCoroutine(float duration)
+    {
+        message2Panel.SetActive(true);
+        yield return new WaitForSeconds(duration);
+        message2Panel.SetActive(false);
+    }
+
     public void CheckInput()
     {
         // Record input and let task handle it
@@ -770,6 +878,65 @@ public class GraphicalInterface : MonoBehaviour
         input.text = "";
     }
 
+public void CheckButtonY1()
+    {
+        //do I want to compute another path? YES
+        // recalculate the path adding this obstacle in the way - modify navmesh?
+        isStuck=false; //because of simulation
+        // maybe adding a new UI saying recalculating a new path 
+        infoObstacle1.SetActive(false);
+        autoNavigation.DisableAutonomy();
+        ShowPopUpMessage("Recalculating",5f);
+        //AutoNavigation.active=true;
+        autoNavigation.EnableAutonomy();
+        // code: infoRecalcuting.SetActive(true);
+        //infoObstacle2.SetActive(true);
+        
+    }
+
+    public void CheckButtonN1()
+    {
+        //do I want to compute another path? NO
+        //navigate to the next UI. end autonavigation. 
+        isStuck=false;//because of simulation**
+        infoObstacle1.SetActive(false);
+        infoObstacle2.SetActive(true);
+        
+    }
+
+    public void CheckButtonY2()
+    {
+        //end autonavigation? YES
+        autoNavigation.DisableAutonomy();
+        infoObstacle2.SetActive(false);
+        //next UI, move obstacle
+        //infoObstacle3.SetActive(true);
+    }
+
+    public void CheckButtonN2()
+    {
+        //end autonavigation? NO
+        //autoNavigation.DisableAutonomy();
+        infoObstacle2.SetActive(false);
+        //next UI, move obstacle
+        infoObstacle3.SetActive(true);
+    }
+
+    public void CheckButtonY3()
+    {
+        //do you want to move the obstacle? YES
+        // autoNavigation.pause=true;
+        autoNavigation.EnableAutonomy();
+        infoObstacle3.SetActive(false);
+    }
+
+    public void CheckButtonN3()
+    {
+        //do you want to move the obstacle? NO
+        autoNavigation.DisableAutonomy();
+        //next UI, move obstacle
+        infoObstacle3.SetActive(false);
+    }
     public Camera[] GetCurrentActiveCameras()
     {
         Camera[] cameras = new Camera[0];
