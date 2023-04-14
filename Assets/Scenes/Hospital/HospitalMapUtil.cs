@@ -17,7 +17,7 @@ public static class HospitalMapUtil
         {"Room L101", new float[] {-14f, -3.0f, -9.0f, 9.0f}},
         {"Treatment Room 1", new float[] {-5.5f, -0.5f, -1.0f, 6.5f}},
         {"Treatment Room 2", new float[] { 2.0f, -0.5f,  6.5f, 6.5f}},
-        {"Nurse station", new float[] { 9.0f, -3.0f, 15f, 3.0f}},
+        {"Nurse Station", new float[] { 9.0f, -3.0f, 15f, 3.0f}},
         {"Pharmacy", new float[] {-14f, 9.0f, -5.0f, 15f}},
         {"Staff Lounge", new float[] {-5.0f, 9.0f, -1.0f, 15f}},
         {"Office", new float[] {-1.0f, 9.0f, 3.0f, 15f}},
@@ -47,7 +47,7 @@ public static class HospitalMapUtil
                                             new Vector3 (0f, 0f, 0f)}},
         {"Treatment Room 2", new Vector3[] {new Vector3 ( 5.0f, 180.0f, 0.5f), 
                                             new Vector3 (0f, 0f, 0f)}},
-        {"Nurse station", new Vector3[] {new Vector3 (10.0f, 0.0f, 1.0f), 
+        {"Nurse Station", new Vector3[] {new Vector3 (10.0f, 0.0f, 1.0f), 
                                          new Vector3 (0f, 90f, 0f)}},
         {"Pharmacy", new Vector3[] {new Vector3 (-7.0f, 0.0f, 10.0f), 
                                     new Vector3 (0f, 0f, 0f)}},
@@ -109,7 +109,7 @@ public static class HospitalMapUtil
                         new Vector3 ( 3.4f, 0.0f, 1.0f),
                         new Vector3 ( 5.7f, 0.0f, 4.1f)
         }},
-        {"Nurse station", new Vector3[] {
+        {"Nurse Station", new Vector3[] {
                         new Vector3 (10.4f, 0.0f, 0.5f),
                         new Vector3 (11.4f, 0.0f, 0.5f),
                         new Vector3 (12.4f, 0.0f, 0.5f)
@@ -186,7 +186,7 @@ public static class HospitalMapUtil
                         new Vector3 (2.7f, 0.8f, 1.6f),
                         new Vector3 (5.9f, 0.9f, 4.1f)
         }},
-        {"Nurse station", new Vector3[] {
+        {"Nurse Station", new Vector3[] {
                         new Vector3 ( 9.2f, 1.0f, -1.8f),
                         new Vector3 (10.9f, 1.0f, -0.3f),
                         new Vector3 (13.1f, 1.0f, -0.3f)
@@ -264,7 +264,7 @@ public static class HospitalMapUtil
         }},
         {"Treatment Room 1", new Vector3[0]},
         {"Treatment Room 2", new Vector3[0]},
-        {"Nurse station", new Vector3[0]},
+        {"Nurse Station", new Vector3[0]},
         {"Pharmacy", new Vector3[0]},
         {"Staff Lounge", new Vector3[0]},
         {"Office", new Vector3[0]},
@@ -316,7 +316,7 @@ public static class HospitalMapUtil
         }},
         {"Treatment Room 1", new Vector3[0]},
         {"Treatment Room 2", new Vector3[0]},
-        {"Nurse station", new Vector3[0]},
+        {"Nurse Station", new Vector3[0]},
         {"Pharmacy", new Vector3[] {
                         new Vector3 (-6.7f, 0.0f, 2.7f),
                         new Vector3 ( 0.0f, 0.0f, 0.0f),
@@ -370,7 +370,7 @@ public static class HospitalMapUtil
             if (IsInsideRoom(new Vector2(x, z), entry.Value))
                 return entry.Key;
         }
-        return "CORRIDOR"; // Default
+        return "Corridor"; // Default
     }
     private static bool IsInsideRoom(Vector2 pos, float[] roomPosition)
     {

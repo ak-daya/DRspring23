@@ -17,7 +17,6 @@ public class NavigationTask : Task
         if (robot == null)
             return false;
         // Check if robot reaches the neighbor of the current goal
-        
         if (goals[goalIndex].CheckIfObjectReachedGoal(robot))
         {
             // prev goal
@@ -28,7 +27,6 @@ public class NavigationTask : Task
             if (goalIndex != goals.Length)
             {
                 goals[goalIndex].EnableGoalVisualEffect(); 
-                //gUI.ShowLocation("Testing");
             }
 
             // if all goal reached
