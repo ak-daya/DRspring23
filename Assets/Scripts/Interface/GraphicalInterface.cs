@@ -666,13 +666,13 @@ public class GraphicalInterface : MonoBehaviour
         // Minimap camera game object
         minimapCameraObject = new GameObject("Minimap Camera");
         minimapCameraObject.transform.parent = robot.transform;
-        minimapCameraObject.transform.localPosition = new Vector3(0f, 5f, 1f);
+        minimapCameraObject.transform.localPosition = new Vector3(0f, 2.1f, 0f);
         minimapCameraObject.transform.localRotation = Quaternion.Euler(new Vector3(90f, 0f, 0f));
         // minimap camera settings
         minimapCamera = minimapCameraObject.AddComponent<Camera>();
-        minimapCamera.orthographic = true;
+        minimapCamera.orthographic = false;
         minimapCamera.orthographicSize = minimapSizes[minimapSizeIndex];
-        minimapCamera.cullingMask = LayerMask.GetMask("Robot", "Laser", "Map");
+        minimapCamera.cullingMask = LayerMask.GetMask("Default", "Human", "Floor", "Wall", "GraspableObject", "Robot", "Laser");
         // minimap framerate
         minimapCamera.targetTexture = minimapRendertexture;
         CameraFrameRate fr = minimapCameraObject.AddComponent<CameraFrameRate>();
