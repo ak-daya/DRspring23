@@ -3258,6 +3258,7 @@ MonoBehaviour:
   - {fileID: 6789262394701009808}
   objectPositions: []
   objectRotations: []
+  isStuck: 0
 --- !u!114 &1247397182830612179
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3413,7 +3414,7 @@ MonoBehaviour:
   directions: []
   obstacleRanges: []
   humanRanges: []
-  instantiateScanResult: 0
+  instantiateScanResult: 1
   scanResultPrefab: {fileID: 662264924414211634, guid: 81a7a695a4ffad24ea2a12b5198474c3, type: 3}
 --- !u!1 &4478812758972552443
 GameObject:
@@ -25775,6 +25776,7 @@ MonoBehaviour:
   agent: {fileID: 3639390875846661778}
   navMeshObstacles: []
   replanTime: 5
+  currentDis: 0
   goalPrefab: {fileID: 2075622757900185994, guid: 8a7b41268e0286d47ae6853ee8ab563e, type: 3}
   lineRenderer: {fileID: 109961253}
   drawPathEnabled: 1
