@@ -64,12 +64,15 @@ public class GraphicalInterface : MonoBehaviour
     private int minimapSizeIndex;
 
     // Map
+    public GameObject mapMesh;
     private RenderTexture mapRendertexture;
     private GameObject mapCameraObject;
     private Camera mapCamera;
     private Vector3 prevClickPoint = Vector3.zero;
     public Vector3 punto = Vector3.zero;
-    
+    private float lenRatio = 1440.0f / 1920.0f;     // portion of GUI screen used by map
+    private float widRatio = 810.0f / 1080.0f;      // portion of GUI screen used by map
+
     // battery
     private float robotSpawnedTime;
     private Slider batterySlider;
@@ -268,16 +271,27 @@ public class GraphicalInterface : MonoBehaviour
             Input.GetMouseButtonDown(0))
         {
             RaycastHit hit;
-            Ray ray = mapCamera.ScreenPointToRay(Input.mousePosition);
-            // Debug.Log("Mouse clic" + Input.mousePosition);
-            if (Physics.Raycast(ray, out hit))
+            if (Input.mousePosition.x <= lenRatio * Screen.width && Input.mousePosition.y <= widRatio * Screen.height)
             {
-                SetNavigationGoal(hit.point);
-                punto=hit.point;
-                // Debug.Log("Setting goal" + hit.point);
+                // Scale mouse position to map camera dimensions
+                float scaledX = (Input.mousePosition.x - 0.0f) / (lenRatio * Screen.width) * (mapCamera.pixelWidth);
+                float scaledY = (Input.mousePosition.y - 0.0f) / (widRatio * Screen.height) * (mapCamera.pixelHeight);
+                Ray ray = mapCamera.ScreenPointToRay(new Vector3(scaledX, scaledY, 0.0f));
+                // Debug.DrawRay(ray.origin, ray.direction * 1000, Color.green, 1.0f);
+                
+                // Map layermask in bits
+                int layerMask = 1 << 11;
+                if (Physics.Raycast(ray, out hit, Mathf.Infinity, layerMask)) //(ray, out hit, layerMask)
+                {
+                    // Debug.Log("Hitting: " + hit.collider);
+
+                    // Correct for height
+                    Vector3 newHit = hit.point + new Vector3(0.0f, 3.0f, 0.0f);
+                    SetNavigationGoal(newHit);
+                    punto = hit.point;
+                }
             }
         }
-
 
         //Debug.Log("Time : " + stuckTimeElapsed + "vel " + stateReader.linearVelocity.magnitude);
         if (autoNavigation.active)
@@ -690,6 +704,7 @@ public class GraphicalInterface : MonoBehaviour
         mapCamera = mapCameraObject.AddComponent<Camera>();
         mapCamera.enabled = false;
         mapCamera.orthographic = true;
+        //float orthosize = (int)cameraResolution.y / 2;
         mapCamera.orthographicSize = 14f;
         mapCamera.cullingMask = LayerMask.GetMask("Robot", "Map");
         mapCamera.targetTexture = mapRendertexture;
