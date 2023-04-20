@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8318939651628406324}
   - component: {fileID: 8318939651628406325}
   - component: {fileID: 8318939651628406282}
+  - component: {fileID: -7949452463609552805}
   m_Layer: 11
   m_Name: Map
   m_TagString: Map
@@ -81,3 +82,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &-7949452463609552805
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8318939651628406280}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 10, y: 0, z: 10}
+  m_Center: {x: 0, y: 0, z: 0}
