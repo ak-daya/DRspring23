@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.AI;
 
 public class GraphicalInterface : MonoBehaviour
 {
@@ -29,6 +30,8 @@ public class GraphicalInterface : MonoBehaviour
     private float dPos = 1;
     private float elapsedTime;
     private float nextActionTime;
+    private GameObject obstacle;
+    private NavMeshObstacle obstacle_navmesh;
 
     // Robot
     private GameObject robot;
@@ -64,7 +67,6 @@ public class GraphicalInterface : MonoBehaviour
     private int minimapSizeIndex;
 
     // Map
-    public GameObject mapMesh;
     private RenderTexture mapRendertexture;
     private GameObject mapCameraObject;
     private Camera mapCamera;
@@ -127,8 +129,14 @@ public class GraphicalInterface : MonoBehaviour
     // Help
     private TextMeshProUGUI helpDisplayText;
     private TextMeshProUGUI helpDisplay2Text;
+    public bool flag2=false;
+    public bool flag3=false;
+    public bool flag4=true;
+    public string CarryingObject;
+
     // obstacle
     private TextMeshProUGUI infoObstacleText;
+
     //future trajectory 
     private LineRenderer lineRenderer;
 
@@ -250,19 +258,52 @@ public class GraphicalInterface : MonoBehaviour
         // help panel
         if (Input.GetKeyDown(KeyCode.H))
         { 
+            flag2=!flag2;
             ChangeHelpDisplay2();
             //ChangeInfoObstacle();
         }
         // minimap
         if(Input.GetKeyDown(KeyCode.M))
         {
+            flag3=!flag3;
             if (Input.GetKey(KeyCode.LeftShift))
                 ChangeMinimapView();
             else
                 {
                     ZoomMap();
                     ChangeHelpDisplay2();
-                    //ChangeInfoObstacle();
+                }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Y))
+        { 
+            if (infoObstacle3.active)
+            {
+                CheckButtonY3();
+            }
+            else if (infoObstacle2.active)
+            {
+                CheckButtonY2();
+            }
+            else if (infoObstacle1.active)
+            {
+                CheckButtonY1();
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.N))
+        { 
+            if (infoObstacle3.active)
+            {
+                CheckButtonN3();
+            }
+            else if (infoObstacle2.active)
+            {
+                CheckButtonN2();
+            }
+            else if (infoObstacle1.active)
+            {
+                CheckButtonN1();
                 }
         }
 
@@ -304,9 +345,9 @@ public class GraphicalInterface : MonoBehaviour
                 if (stuckTimeElapsed > stuckTime)
                 {
                     // Stuck
-                    //Debug.Log("I'm stuck");
                     isStuck = true;
-                    // autoNavigation.DisableAutonomy();
+                    autoNavigation.pause=true;
+                    autoNavigation.EnableAutonomy();
                     stuckTimeElapsed = 0f;
                 }
                 // Call collisionReader.IsColliding() to stop robot when colliding
@@ -476,7 +517,8 @@ public class GraphicalInterface : MonoBehaviour
         // Help display
         UpdateHelpDisplay(controlMode);
         UpdateHelpDisplay2(controlMode, localization.position);
-        UpdateObstacle(isStuck);
+        UpdateObstacle(isStuck,flag);
+        UpdateHolding();
     }
 
     private void UpdateCameraViewing(int cameraIndex)
@@ -573,7 +615,6 @@ public class GraphicalInterface : MonoBehaviour
             if (autoNavigation.active==false)
                 {
                 helpDisplay2Text.text = location.ToUpper();
-                //punto=Vector3.zero;
                 }    
         }
         //lineRenderer.startWidth = 0.5f;
@@ -583,27 +624,32 @@ public class GraphicalInterface : MonoBehaviour
         //lineRenderer.SetColors(c1, c2);
     }
     
-    private void UpdateObstacle(bool isStuck)
+    private void UpdateObstacle(bool isStuck, bool flag)
     {
-        if (isStuck==true)
+        if (isStuck==true && flag==false)
             {
-                infoObstacle1.SetActive(true);
-                //flag=true;
-                //infoObstacle2.SetActive(false);
-                //infoObstacle3.SetActive(false);
-                //infoObstacleText.text = "STUCK: " + isStuck;
+                infoObstacle3.SetActive(true);
+                flag=true;
             }
-        //else
-        //    {
-        //        infoObstacle1.SetActive(false);
-                //infoObstacleText.text = "";
-        //    }
-        //if (isStuck==false && autoNavigation.active==true)
-        //{
-        //        infoObstacle2.SetActive(true);
-                //infoObstacleText.text = "STUCK: " + isStuck;
-        //}
+        
     }
+
+
+    public void UpdateHolding()
+    {
+        bool state = autoNavigation.leftGrasp||autoNavigation.rightGrasp;
+        if (flag4 && stateReader.linearVelocity.magnitude > 1.0f)
+        {
+            infoObstacle1.SetActive(state);
+            flag4 = false;
+        }
+        if (!state)
+        {
+            CarryingObject=null;
+            flag4=true;
+        }
+    }
+
     private void UpdateLocalization(Vector3 position, Vector3 rotation)
     {
         // location name
@@ -704,7 +750,6 @@ public class GraphicalInterface : MonoBehaviour
         mapCamera = mapCameraObject.AddComponent<Camera>();
         mapCamera.enabled = false;
         mapCamera.orthographic = true;
-        //float orthosize = (int)cameraResolution.y / 2;
         mapCamera.orthographicSize = 14f;
         mapCamera.cullingMask = LayerMask.GetMask("Robot", "Map");
         mapCamera.targetTexture = mapRendertexture;
@@ -730,11 +775,10 @@ public class GraphicalInterface : MonoBehaviour
     }
     public void ChangeHelpDisplay2()
     {
-        helpDisplay2.SetActive(!helpDisplay2.activeSelf);
+        helpDisplay2.SetActive(flag2&&!flag3);
     }
     public void ChangeInfoObstacle1()
     {
-        //Debug.Log("cambiando");
         infoObstacle1.SetActive(!infoObstacle1.activeSelf);
     }
 
@@ -893,64 +937,70 @@ public class GraphicalInterface : MonoBehaviour
         input.text = "";
     }
 
-public void CheckButtonY1()
-    {
-        //do I want to compute another path? YES
-        // recalculate the path adding this obstacle in the way - modify navmesh?
-        isStuck=false; //because of simulation
-        // maybe adding a new UI saying recalculating a new path 
-        infoObstacle1.SetActive(false);
-        autoNavigation.DisableAutonomy();
-        ShowPopUpMessage("Recalculating",5f);
-        //AutoNavigation.active=true;
-        autoNavigation.EnableAutonomy();
-        // code: infoRecalcuting.SetActive(true);
-        //infoObstacle2.SetActive(true);
-        
-    }
-
     public void CheckButtonN1()
     {
-        //do I want to compute another path? NO
-        //navigate to the next UI. end autonavigation. 
-        isStuck=false;//because of simulation**
+        //Holding a CART
         infoObstacle1.SetActive(false);
-        infoObstacle2.SetActive(true);
-        
+        CarryingObject="cart";
+        Debug.Log("holding a cart");
+    }
+
+    public void CheckButtonY1()
+    {
+        //Holding a POLE
+        infoObstacle1.SetActive(false);
+        CarryingObject="pole";
+        Debug.Log("holding a pole");
     }
 
     public void CheckButtonY2()
     {
-        //end autonavigation? YES
-        autoNavigation.DisableAutonomy();
+        //waiting until you clear the path. CONTINUE
         infoObstacle2.SetActive(false);
+        autoNavigation.pause=false;
+        //autoNavigation.active=true;
+        autoNavigation.EnableAutonomy();
+        //infoObstacle1.SetActive(true);
         //next UI, move obstacle
         //infoObstacle3.SetActive(true);
     }
 
     public void CheckButtonN2()
     {
-        //end autonavigation? NO
-        //autoNavigation.DisableAutonomy();
+        //waiting until you clear the path. END AUTO
+        autoNavigation.DisableAutonomy();
+        autoNavigation.pause=false;
         infoObstacle2.SetActive(false);
-        //next UI, move obstacle
-        infoObstacle3.SetActive(true);
     }
 
     public void CheckButtonY3()
     {
-        //do you want to move the obstacle? YES
-        // autoNavigation.pause=true;
-        autoNavigation.EnableAutonomy();
+        //Can we move the obstacle? YES
+        //navigate to the next UI. end autonavigation. 
+        isStuck=false;//because of simulation**
         infoObstacle3.SetActive(false);
+        infoObstacle2.SetActive(true);
     }
 
     public void CheckButtonN3()
     {
-        //do you want to move the obstacle? NO
-        autoNavigation.DisableAutonomy();
-        //next UI, move obstacle
+        //Can we move the obstacle? NO
+        // recalculate the path adding this obstacle in the way - modify navmesh?
+        isStuck=false; //because of simulation**
+        // maybe adding a new UI saying recalculating a new path 
         infoObstacle3.SetActive(false);
+
+        // Obstacle Handling
+        obstacle = GameObject.Find("Service Cart DEMO(Clone)");
+        obstacle_navmesh = obstacle.GetComponent<NavMeshObstacle>();
+        
+        // Set carving active
+        obstacle_navmesh.carving = true;
+
+        //autoNavigation.DisableAutonomy();
+        ShowPopUpMessage("Recalculating",5f);
+        autoNavigation.pause=false;
+        autoNavigation.EnableAutonomy();
     }
     public Camera[] GetCurrentActiveCameras()
     {

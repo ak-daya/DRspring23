@@ -12,6 +12,9 @@ using UnityEngine.AI;
 public class AutoNavigation : MonoBehaviour
 {
     public bool active;
+    public bool pause=false;
+    public bool leftGrasp = false;
+    public bool rightGrasp = false;
 
     // Robot
     public GameObject robot;
@@ -48,28 +51,38 @@ public class AutoNavigation : MonoBehaviour
     private GameObject goalObject;
     public LineRenderer lineRenderer;
     public bool drawPathEnabled = true;
-
-    // Debug
-    private int i = 0;
+    //private int i = 0;
+    Color c1 = Color.blue;
+    Color c2 = new Color(241, 90, 34, 0);
 
 
     void Start()
     {
         // never enabled
         agent.enabled = false;
+        //lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        //lineRenderer.SetColors(c1, c2);
+        lineRenderer.startWidth = 0.5f;
+        lineRenderer.endWidth = 0.5f;
     }
 
     void Update()
     {
+        CheckHold(); //check if any arm is holding an object
         // Path visualization
         if (!drawPathEnabled || waypoints.Length == 0)
         {
             lineRenderer.positionCount = 0;
             if (goalObject != null)
+            {
                 Destroy(goalObject);
+            }
+                
             return;
         }
-        // Draw current point + waypoints
+        // Draw current point + waypoints**
+        //lineRenderer.width=6.5f;
+        //lineRenderer.Color=red;
         lineRenderer.positionCount = (1 + waypoints.Length - waypointIndex);
         lineRenderer.SetPosition(0, transform.position);
         for (int i = 0; i < waypoints.Length - waypointIndex; ++i)
@@ -89,6 +102,7 @@ public class AutoNavigation : MonoBehaviour
             goalObject = Instantiate(goalPrefab,
                                      waypoints[waypoints.Length-1], 
                                      Quaternion.identity);
+            //Debug.Log(waypoints[waypoints.Length-1]);
             Utils.SetGameObjectLayer(goalObject, "Robot", true);
         }
     }
@@ -104,6 +118,8 @@ public class AutoNavigation : MonoBehaviour
         if (elapsed > replanTime)
         {
             // replan
+            elapsed = 0f;
+            SetGoal(this.goal);
             Replan();
         }
 
@@ -117,8 +133,10 @@ public class AutoNavigation : MonoBehaviour
         if (waypointIndex == waypoints.Length - 1)
             tolerance = agent.stoppingDistance;
         // move to current waypoint
-        currentDis = (transform.position - waypoints[waypointIndex]).magnitude;
-
+        float currentDis = (transform.position - waypoints[waypointIndex]).magnitude;
+        //Debug.Log(currentDis);
+        //Debug.Log(transform.position);
+        //Debug.Log(transform.rotation);
         /*
         // temp - Check if the robot is approaching the waypoint
         if (prevDis == 0)
@@ -152,9 +170,11 @@ public class AutoNavigation : MonoBehaviour
             {
                 wheelController.SetRobotVelocity(0f, 0f);
                 DisableAutonomy();
+
             }
         }
     }
+
 
 private void NavigateToWaypoint(Vector3 waypoint)
     {
@@ -205,9 +225,19 @@ private void NavigateToWaypoint(Vector3 waypoint)
         if (changeArmPose)
         {
             bool success = ChangeArmPose(5);
-            Debug.Log("Changing arm pose failed.");
             if (!success)
+                {Debug.Log("Changing arm pose failed.");
                 return;
+                }
+        }
+        //pause autonavigation
+        if (pause)
+        {
+            //Debug.Log("Pause: " + pause);
+            wheelController.SetRobotVelocity(0f, 0f);
+            active=false;
+            return;
+
         }
         active = true;
     }
@@ -221,6 +251,12 @@ private void NavigateToWaypoint(Vector3 waypoint)
             rightSuccess = rightArmControlManager.MoveToPreset(presetIndex);
         }
         return leftSuccess && rightSuccess;
+    }
+
+    public void CheckHold()
+    {
+        leftGrasp = leftArmControlManager.grasping.isGrasping;
+        rightGrasp = rightArmControlManager.grasping.isGrasping;
     }
 
     public void DisableAutonomy()
@@ -246,9 +282,11 @@ private void NavigateToWaypoint(Vector3 waypoint)
     {
         // Get closest point in the nav mesh
         NavMeshHit hit;
+        //Debug.Log("goal" + goal);
         if (NavMesh.SamplePosition(goal, out hit, 1f, agent.areaMask))
         {
             goal = hit.position;
+            //Debug.Log(goal);
             // prevent nav mesh obstacles blocking path
             if (planningCoroutine != null)
                 StopCoroutine(planningCoroutine);
@@ -303,6 +341,7 @@ private void NavigateToWaypoint(Vector3 waypoint)
         for (int i = 0; i < path.corners.Length; ++i)
         {
             waypoints[i] = path.corners[i];
+            //Debug.Log(waypoints[i]);
         }
     }
 }
